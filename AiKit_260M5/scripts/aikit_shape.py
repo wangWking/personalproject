@@ -1,11 +1,8 @@
-from operator import imod
-from tokenize import Pointfloat
 import cv2
 import numpy as np
 import time
-import json
 import os,sys
-
+import math
 from pymycobot.mypalletizer import MyPalletizer
 
 
@@ -51,13 +48,7 @@ class Object_detect():
             "blue": [np.array([100, 43, 46]), np.array([124, 255, 255])],
             "cyan": [np.array([78, 43, 46]), np.array([99, 255, 255])],
         }
-        # self.HSV = {
-        #     "yellow": [np.array([22, 93, 0]), np.array([45, 255, 245])],
-        #     "red": [np.array([0, 120, 120]), np.array([6, 255, 255])],
-        #     "green": [np.array([35, 43, 35]), np.array([90, 255, 255])],
-        #     "blue": [np.array([100, 43, 46]), np.array([124, 255, 255])],
-        #     "cyan": [np.array([78, 43, 46]), np.array([99, 255, 255])],
-        # }
+
         # use to calculate coord between cube and mypal260
         self.sum_x1 = self.sum_x2 = self.sum_y2 = self.sum_y1 = 0
         # The coordinates of the grab center point relative to the mypal260
@@ -141,7 +132,7 @@ class Object_detect():
     # init mypal260
     def run(self):
      
-        self.mc = MyPalletizer("COM9", 115200) 
+        self.mc = MyPalletizer("COM9", 115200)
         self.mc.send_angles([-29.0, 5.88, -4.92, -76.28], 20)
         time.sleep(3)
 
@@ -222,181 +213,101 @@ class Object_detect():
             frame = frame[int(self.y2*0.78):int(self.y1*1.1),
                           int(self.x1*0.88):int(self.x2*1.06)]
         return frame
-
-    # detect cube color
-    def color_detect(self, img):
-        # set the arrangement of color'HSV
-        x = y = 0
-        for mycolor, item in self.HSV.items():
-            # print("mycolor:",mycolor)
-            redLower = np.array(item[0])
-            redUpper = np.array(item[1])
-
-            # transfrom the img to model of gray
-            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-            # print("hsv",hsv)
-
-            # wipe off all color expect color in range
-            mask = cv2.inRange(hsv, item[0], item[1])
-
-            # a etching operation on a picture to remove edge roughness
-            erosion = cv2.erode(mask, np.ones((1, 1), np.uint8), iterations=2)
-
-            # the image for expansion operation, its role is to deepen the color depth in the picture
-            dilation = cv2.dilate(erosion, np.ones(
-                (1, 1), np.uint8), iterations=2)
-
-            # adds pixels to the image
-            target = cv2.bitwise_and(img, img, mask=dilation)
-
-            # the filtered image is transformed into a binary image and placed in binary
-            ret, binary = cv2.threshold(dilation, 127, 255, cv2.THRESH_BINARY)
-
-            # get the contour coordinates of the image, where contours is the coordinate value, here only the contour is detected
-            contours, hierarchy = cv2.findContours(
-                dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-            if len(contours) > 0:
-                # do something about misidentification
-                boxes = [
-                    box
-                    for box in [cv2.boundingRect(c) for c in contours]
-                    if min(img.shape[0], img.shape[1]) / 10
-                    < min(box[2], box[3])
-                    < min(img.shape[0], img.shape[1]) / 1
-                ]
-                if boxes:
-                    for box in boxes:
-                        x, y, w, h = box
-                    # find the largest object that fits the requirements
-                    c = max(contours, key=cv2.contourArea)
-                    # get the lower left and upper right points of the positioning object
-                    x, y, w, h = cv2.boundingRect(c)
-                    # locate the target by drawing rectangle
-                    cv2.rectangle(img, (x, y), (x+w, y+h), (153, 153, 0), 2)
-                    # calculate the rectangle center
-                    x, y = (x*2+w)/2, (y*2+h)/2
-                    # calculate the real coordinates of mypal260 relative to the target
-                    
-                    # if mycolor == "red":
-                    #     self.color = 0
-                    # elif mycolor == "green":
-                    #     self.color = 1
-                    # elif mycolor == "blue":
-                    #     self.color = 2
-                    #     # break
-                    # elif mycolor == "yellow":
-                    #     self.color = 3
-                    # else:
-                    #     self.color = 3
-                    
-                    if mycolor  == "yellow":
-                        
-                        self.color = 3
-                        break
-
-                    elif mycolor == "red":
-                        self.color = 0
-                        break
-
-                    elif mycolor == "cyan":
-                        self.color = 2
-                        break
-
-                    elif mycolor == "blue":
-                        self.color =2
-                        break
-                    elif mycolor == "green":
-                        self.color = 1
-                        break
-
-        if abs(x) + abs(y) > 0:
-            return x, y
-        else:
-            return None
     
     # 检测物体的形状
     def shape_detect(self,img):
-        ids = 0
-        # height, width = img.shape[:2]
-        # size = (int(width * 0.5), int(height * 0.5))
-        # 缩放
-        # img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
-
-        x = y = 0
+        x = 0
+        y = 0
+        
+        Alpha = 65.6
+        Gamma=-8191.5
+        cal = cv2.addWeighted(img, Alpha,img, 0, Gamma)
         # 转换为灰度图片
-        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(cal, cv2.COLOR_BGR2GRAY)
+
+        # a etching operation on a picture to remove edge roughness
+        erosion = cv2.erode(gray, np.ones((2, 2), np.uint8), iterations=2)
+
+        # the image for expansion operation, its role is to deepen the color depth in the picture
+        dilation = cv2.dilate(erosion, np.ones(
+            (1, 1), np.uint8), iterations=2)
+
+
         # 设定灰度图的阈值 175, 255
-        _, threshold = cv2.threshold(gray, 175, 255, cv2.THRESH_BINARY)
+        _, threshold = cv2.threshold(dilation, 175, 255, cv2.THRESH_BINARY)
         # 边缘检测
         edges = cv2.Canny(threshold,50,100)
         # 检测物体边框
         contours,_ = cv2.findContours(
             edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        
-        # _, threshold = cv2.threshold(gray, 175, 255, cv2.THRESH_BINARY)
-        # edges = cv2.Canny(threshold,100,200)
 
         if len(contours)>0:
-            for cnt in contours[:2]:
-                objectType = None
-                peri = cv2.arcLength(cnt,True)
-                approx = cv2.approxPolyDP(cnt, 0.02 * peri, True)
-                objCor = len(approx)
-                print(np.size(contours))
-                print(cnt[0])
-                boxes = [
-                    box
-                    for box in [cv2.boundingRect(c) for c in contours]
-                    if min(img.shape[0], img.shape[1]) / 10
-                    < min(box[2], box[3])
-                    < min(img.shape[0], img.shape[1]) / 1
-                ]
-                if boxes:
-                    for box in boxes:
-                        x, y, w, h = box
-                    # find the largest object that fits the requirements
-                    c = max(contours, key=cv2.contourArea)
-                    # get the lower left and upper right points of the positioning object
-                    x, y, w, h = cv2.boundingRect(c)
-                    # locate the target by drawing rectangle
-                    cv2.rectangle(img, (x, y), (x+w, y+h), (153, 153, 0), 2)
-                    # calculate the rectangle center
-                    x, y = (x*2+w)/2, (y*2+h)/2
-                if objCor==3:
-                    objectType = "Triangle"
-                    cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
-                    ids = 1
-                    cv2.putText(img,"ids={}".format(ids),(0, 120), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (243, 0, 0), 2,) 
-                    self.color = 0 
-                elif objCor==4:
-                    '''这里可继续改进判断是长方形还是正方形'''
-                    objectType = "Square"
-                    cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
-                    ids = 2
-                    cv2.putText(img,"ids={}".format(ids),(0, 40), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (243, 0, 0), 2,) 
-                    self.color=1
-                elif objCor>=5:
-                    objectType = "Circle"
-                    self.color=2
-                    cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
-                    ids = 3
-                    cv2.putText(img,"ids={}".format(ids),(0,80), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (243, 0, 0), 2,) 
-                else:
-                    pass
-                print("形状为",objectType,"color",self.color)
-                
+            for cnt in contours:
+                # if 6000>cv2.contourArea(cnt) and cv2.contourArea(cnt)>4500:
+                if cv2.contourArea(cnt)>5500:
+                    objectType = None
+                    peri = cv2.arcLength(cnt,True)
+                    approx = cv2.approxPolyDP(cnt, 0.02 * peri, True)
+                    objCor = len(approx)
+
+                    boxes = [
+                        box
+                        for box in [cv2.boundingRect(c) for c in contours]
+                        if min(img.shape[0], img.shape[1]) / 10
+                        < min(box[2], box[3])
+                        < min(img.shape[0], img.shape[1]) / 1
+                    ]
+                    if boxes:
+                        for box in boxes:
+                            x, y, w, h = box
+                        # find the largest object that fits the requirements
+                        c = max(contours, key=cv2.contourArea)
+                        rect = cv2.minAreaRect(c)
+                        box = cv2.boxPoints(rect)
+                        box = np.int0(box)
+                        cv2.drawContours(img, [box], 0, (153, 153, 0), 2)
+                        x = int(rect[0][0])
+                        y = int(rect[0][1])
+
+                    if objCor==3:
+                        objectType = "Triangle"
+                        self.color = 3
+                        cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
+                        
+                    elif objCor==4:
+                        box = cv2.boxPoints(rect)
+                        box = np.int0(box)
+                        _W = math.sqrt(math.pow((box[0][0] - box[1][0]), 2) + math.pow((box[0][1] - box[1][1]), 2))
+                        _H = math.sqrt(math.pow((box[0][0] - box[3][0]), 2) + math.pow((box[0][1] - box[3][1]), 2))
+                        aspRatio = _W/float(_H)
+                        if 0.98 < aspRatio < 1.03:
+                            objectType = "Square"
+                            cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
+                            self.color=1
+                        else:
+                            objectType = "Rectangle"
+                            cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
+                            self.color=2
+                    elif objCor>=5:
+                        objectType = "Circle"
+                        self.color=0
+                        cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
+                    else:
+                        pass
+                    print("形状为",objectType)
+
         if abs(x) + abs(y) > 0:
             return x, y
         else:
             return None
-        
+
         
 if __name__ == "__main__":
 
     # open the camera
     cap_num = 1
-    cap = cv2.VideoCapture(cap_num, cv2.CAP_V4L)
+    # cap = cv2.VideoCapture(cap_num, cv2.CAP_V4L)
+    cap = cv2.VideoCapture(cap_num)
     if not cap.isOpened():
         cap.open(1)
     # init a class of Object_detect

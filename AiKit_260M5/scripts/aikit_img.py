@@ -1,17 +1,8 @@
 from multiprocessing import Process, Pipe
-# import queue
-# from sys import path
-# from tokenize import Pointfloat
-# from turtle import color
-# from typing_extensions import Self
 import cv2
 import numpy as np
 import time
-# import json
 import os,sys
-
-# from PIL import Image
-# from threading import Thread
 from pymycobot.mypalletizer import MyPalletizer
 
 IS_CV_4 = cv2.__version__[0] == '4'
@@ -35,10 +26,10 @@ class Object_detect():
 
         # 移动坐标
         self.move_coords = [
-            [132.6, -155.6, 211.8, -20.9],  # above the red bucket
-            [232.5, -134.1, 197.7, -45.26], # above the green bucket
-            [111.6, 159, 221.5, -120], # above the blue bucket
-            [-15.9, 164.6, 217.5, -119.35], # above the gray bucket  
+            [132.6, -155.6, 211.8, -20.9],  # D Sorting area
+            [232.5, -134.1, 197.7, -45.26], # C Sorting area
+            [111.6, 159, 221.5, -120], # A Sorting area
+            [-15.9, 164.6, 217.5, -119.35], # B Sorting area  
         ]
    
         # choose place to set cube
@@ -418,10 +409,10 @@ def run():
     child.start()
 
     res_queue = [[], [], [], []]
-    res_queue[0] = parse_folder('res/red')
-    res_queue[1] = parse_folder('res/green')
-    res_queue[2] = parse_folder('res/blue')
-    res_queue[3] = parse_folder('res/gray')
+    res_queue[0] = parse_folder('res/D')
+    res_queue[1] = parse_folder('res/C')
+    res_queue[2] = parse_folder('res/A')
+    res_queue[3] = parse_folder('res/B')
 
     sift = cv2.xfeatures2d.SIFT_create()
     kp_list, desc_list = compute_keypoints_and_descriptors(sift, res_queue)

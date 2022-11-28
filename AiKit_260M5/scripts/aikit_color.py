@@ -1,9 +1,6 @@
-from operator import imod
-from tokenize import Pointfloat
 import cv2
 import numpy as np
 import time
-import json
 import os,sys
 
 from pymycobot.mypalletizer import MyPalletizer
@@ -31,10 +28,10 @@ class Object_detect():
 
         # 移动坐标
         self.move_coords = [
-            [132.6, -155.6, 211.8, -20.9],   # above the first bucket red
-            [232.5, -134.1, 197.7, -45.26],    # above the second bucket green
-            [111.6, 159, 221.5, -120],   # above the third bucket blue
-            [-15.9, 164.6, 217.5, -119.35],     # gray
+            [132.6, -155.6, 211.8, -20.9],   # D Sorting area
+            [232.5, -134.1, 197.7, -45.26],    # C Sorting area
+            [111.6, 159, 221.5, -120],   # A Sorting area
+            [-15.9, 164.6, 217.5, -119.35],     # B Sorting area
         ]
         # choose place to set cube 选择放置立方体的地方
         self.color = 0
@@ -51,13 +48,6 @@ class Object_detect():
             "blue": [np.array([100, 43, 46]), np.array([124, 255, 255])],
             "cyan": [np.array([78, 43, 46]), np.array([99, 255, 255])],
         }
-        # self.HSV = {
-        #     "yellow": [np.array([22, 93, 0]), np.array([45, 255, 245])],
-        #     "red": [np.array([0, 120, 120]), np.array([6, 255, 255])],
-        #     "green": [np.array([35, 43, 35]), np.array([90, 255, 255])],
-        #     "blue": [np.array([100, 43, 46]), np.array([124, 255, 255])],
-        #     "cyan": [np.array([78, 43, 46]), np.array([99, 255, 255])],
-        # }
         # use to calculate coord between cube and mypal260
         # 用于计算立方体和 mycobot 之间的坐标
         self.sum_x1 = self.sum_x2 = self.sum_y2 = self.sum_y1 = 0
@@ -303,18 +293,6 @@ class Object_detect():
                     x, y = (x*2+w)/2, (y*2+h)/2
                     # calculate the real coordinates of mypal260 relative to the target
                     #  计算 mycobot 相对于目标的真实坐标
-                    
-                    # if mycolor == "red":
-                    #     self.color = 0
-                    # elif mycolor == "green":
-                    #     self.color = 1
-                    # elif mycolor == "blue":
-                    #     self.color = 2
-                    #     # break
-                    # elif mycolor == "yellow":
-                    #     self.color = 3
-                    # else:
-                    #     self.color = 3
                     
                     if mycolor  == "yellow":
                         
