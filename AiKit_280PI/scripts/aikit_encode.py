@@ -31,10 +31,6 @@ class Detect_marker():
         self.aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
         # Get ArUco marker params.
         self.aruco_params = cv2.aruco.DetectorParameters_create()
-        # self.calibrationParams = cv.FileStorage("calibrationFileName.xml", cv.FILE_STORAGE_READ)
-        # Get distance coefficient.
-        # self.dist_coeffs = self.calibrationParams.getNode("distCoeffs").mat()
-        
         # 摄像头的内参矩阵
         self.camera_matrix = np.array([
             [781.33379113, 0., 347.53500524],
@@ -44,19 +40,6 @@ class Detect_marker():
         # 摄像头的畸变系数
         self.dist_coeffs = np.array(([[3.41360787e-01, -2.52114260e+00, -1.28012469e-03,  6.70503562e-03,
              2.57018000e+00]]))
-
-        height = self.cap.get(4)
-        focal_length = width = self.cap.get(3)
-        center = [width / 2, height / 2]
-        # Calculate the camera matrix.
-        # self.camera_matrix = np.array(
-            #[
-               # [focal_length, 0, center[0]],
-               # [0, focal_length, center[1]],
-               # [0, 0, 1],
-           # ],
-           # dtype=np.float32,
-       # )
     
     # 控制吸泵      
     def pub_pump(self, flag):

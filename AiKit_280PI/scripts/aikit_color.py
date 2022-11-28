@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-from operator import imod
-from tokenize import Pointfloat
 import cv2
 import numpy as np
 import time
-import json
 import os,sys
 
 from pymycobot.mycobot import MyCobot
@@ -20,7 +17,7 @@ class Object_detect():
     def __init__(self, camera_x = 155, camera_y = 10):
         # inherit the parent class
         super(Object_detect, self).__init__()
-        # declare mypal260
+        # declare mycobot280
         self.mc = None
 
         # 移动角度
@@ -31,10 +28,10 @@ class Object_detect():
 
         # 移动坐标
         self.move_coords = [
-            [132.2, -136.9, 200.8, -178.24, -3.72, -107.17],  # above the red bucket
-            [238.8, -124.1, 204.3, -169.69, -5.52, -96.52], # green
-            [115.8, 177.3, 210.6, 178.06, -0.92, -6.11], # blue
-            [-6.9, 173.2, 201.5, 179.93, 0.63, 33.83], # gray
+            [132.2, -136.9, 200.8, -178.24, -3.72, -107.17],  # D Sorting area
+            [238.8, -124.1, 204.3, -169.69, -5.52, -96.52], # C Sorting area
+            [115.8, 177.3, 210.6, 178.06, -0.92, -6.11], # A Sorting area
+            [-6.9, 173.2, 201.5, 179.93, 0.63, 33.83], # B Sorting area
         ]
         
         # which robot: USB* is m5; ACM* is wio; AMA* is raspi
@@ -79,20 +76,14 @@ class Object_detect():
             "blue": [np.array([100, 43, 46]), np.array([124, 255, 255])],
             "cyan": [np.array([78, 43, 46]), np.array([99, 255, 255])],
         }
-        # self.HSV = {
-        #     "yellow": [np.array([22, 93, 0]), np.array([45, 255, 245])],
-        #     "red": [np.array([0, 120, 120]), np.array([6, 255, 255])],
-        #     "green": [np.array([35, 43, 35]), np.array([90, 255, 255])],
-        #     "blue": [np.array([100, 43, 46]), np.array([124, 255, 255])],
-        #     "cyan": [np.array([78, 43, 46]), np.array([99, 255, 255])],
-        # }
-        # use to calculate coord between cube and mypal260
+   
+        # use to calculate coord between cube and mycobot280
         # 用于计算立方体和 mycobot 之间的坐标
         self.sum_x1 = self.sum_x2 = self.sum_y2 = self.sum_y1 = 0
-        # The coordinates of the grab center point relative to the mypal260
+        # The coordinates of the grab center point relative to the mycobot280
         # 抓取中心点相对于 mycobot 的坐标
         self.camera_x, self.camera_y = camera_x, camera_y
-        # The coordinates of the cube relative to the mypal260
+        # The coordinates of the cube relative to the mycobot280
         # 立方体相对于 mycobot 的坐标
         self.c_x, self.c_y = 0, 0
         # The ratio of pixels to actual values
@@ -131,7 +122,7 @@ class Object_detect():
 
     # Grasping motion
     def move(self, x, y, color):
-        # send Angle to move mypal260
+        # send Angle to move mycobot280
         print(color)
         self.mc.send_angles(self.move_angles[1], 25)
         time.sleep(3)
@@ -193,7 +184,7 @@ class Object_detect():
             # 调整吸泵吸取位置，y增大,向左移动;y减小,向右移动;x增大,前方移动;x减小,向后方移动
             self.move(x, y, color)
 
-    # init mypal260
+    # init mycobot280
     def run(self):
         if "dev" in self.robot_wio :
             self.mc = MyCobot(self.robot_wio, 115200) 
@@ -241,10 +232,6 @@ class Object_detect():
                     return None
                 x1 = x2 = y1 = y2 = 0
                 point_11, point_21, point_31, point_41 = corners[0][0]
-                # print('point_11:', point_11)
-                # print('point_21:', point_21)
-                # print('point_31:', point_31)
-                # print('point_41:', point_41)
                 x1, y1 = int((point_11[0] + point_21[0] + point_31[0] + point_41[0]) / 4.0), int(
                     (point_11[1] + point_21[1] + point_31[1] + point_41[1]) / 4.0)
                 point_1, point_2, point_3, point_4 = corners[1][0]
@@ -260,16 +247,15 @@ class Object_detect():
         self.y1 = int(y1)
         self.x2 = int(x2)
         self.y2 = int(y2)
-        #print('cut-->',self.x1, self.y1, self.x2, self.y2)
 
-    # set parameters to calculate the coords between cube and mypal260
+    # set parameters to calculate the coords between cube and mycobot280
     # 设置参数以计算立方体和 mycobot 之间的坐标
     def set_params(self, c_x, c_y, ratio):
         self.c_x = c_x
         self.c_y = c_y
         self.ratio = 220.0/ratio
 
-    # calculate the coords between cube and mypal260
+    # calculate the coords between cube and mycobot280
     # 计算立方体和 mycobot 之间的坐标
     def get_position(self, x, y):
         return ((y - self.c_y)*self.ratio + self.camera_x), ((x - self.c_x)*self.ratio + self.camera_y)
@@ -349,20 +335,8 @@ class Object_detect():
                     cv2.rectangle(img, (x, y), (x+w, y+h), (153, 153, 0), 2)
                     # calculate the rectangle center 计算矩形中心
                     x, y = (x*2+w)/2, (y*2+h)/2
-                    # calculate the real coordinates of mypal260 relative to the target
+                    # calculate the real coordinates of mycobot280 relative to the target
                     #  计算 mycobot 相对于目标的真实坐标
-                    
-                    # if mycolor == "red":
-                    #     self.color = 0
-                    # elif mycolor == "green":
-                    #     self.color = 1
-                    # elif mycolor == "blue":
-                    #     self.color = 2
-                    #     # break
-                    # elif mycolor == "yellow":
-                    #     self.color = 3
-                    # else:
-                    #     self.color = 3
                     
                     if mycolor  == "yellow":
                         
@@ -400,7 +374,7 @@ if __name__ == "__main__":
         cap.open()
     # init a class of Object_detect
     detect = Object_detect()
-    # init mypal260
+    # init mycobot280
     detect.run()
 
     _init_ = 20  
@@ -443,7 +417,7 @@ if __name__ == "__main__":
             init_num += 1
             continue
 
-        # calculate params of the coords between cube and mypal260 计算立方体和 mycobot 之间坐标的参数
+        # calculate params of the coords between cube and mycobot280 计算立方体和 mycobot 之间坐标的参数
         if nparams < 10:
             if detect.get_calculate_params(frame) is None:
                 cv2.imshow("figure", frame)
@@ -460,7 +434,7 @@ if __name__ == "__main__":
                 continue
         elif nparams == 10:
             nparams += 1
-            # calculate and set params of calculating real coord between cube and mypal260
+            # calculate and set params of calculating real coord between cube and mycobot280
             # 计算和设置计算立方体和mycobot之间真实坐标的参数
             detect.set_params(
                 (detect.sum_x1+detect.sum_x2)/20.0,
@@ -478,7 +452,7 @@ if __name__ == "__main__":
             continue
         else:
             x, y = detect_result
-            # calculate real coord between cube and mypal260 计算立方体和 mycobot 之间的真实坐标
+            # calculate real coord between cube and mycobot280 计算立方体和 mycobot 之间的真实坐标
             real_x, real_y = detect.get_position(x, y)
             # print('real_x',round(real_x, 3),round(real_y, 3))
             if num == 20:

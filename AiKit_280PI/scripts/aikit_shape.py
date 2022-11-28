@@ -1,9 +1,6 @@
-from operator import imod
-from tokenize import Pointfloat
 import cv2
 import numpy as np
 import time
-import json
 import os,sys
 import math
 
@@ -20,7 +17,7 @@ class Object_detect():
     def __init__(self, camera_x = 160, camera_y = 10):
         # inherit the parent class
         super(Object_detect, self).__init__()
-        # declare mypal260
+        # declare mycobot280
         self.mc = None
 
         # 移动角度
@@ -31,10 +28,10 @@ class Object_detect():
 
         # 移动坐标
         self.move_coords = [
-            [132.2, -136.9, 200.8, -178.24, -3.72, -107.17],  # above the red bucket
-            [238.8, -124.1, 204.3, -169.69, -5.52, -96.52], # green
-            [115.8, 177.3, 210.6, 178.06, -0.92, -6.11], # blue
-            [-6.9, 173.2, 201.5, 179.93, 0.63, 33.83], # gray
+            [132.2, -136.9, 200.8, -178.24, -3.72, -107.17],  # D Sorting area
+            [238.8, -124.1, 204.3, -169.69, -5.52, -96.52], # C Sorting area
+            [115.8, 177.3, 210.6, 178.06, -0.92, -6.11], # A Sorting area
+            [-6.9, 173.2, 201.5, 179.93, 0.63, 33.83], # B Sorting area
         ]
         
         # which robot: USB* is m5; ACM* is wio; AMA* is raspi
@@ -122,7 +119,7 @@ class Object_detect():
 
     # Grasping motion
     def move(self, x, y, color):
-        # send Angle to move mypal260
+        # send Angle to move mycobot280
         print(color)
         self.mc.send_angles(self.move_angles[1], 25)
         time.sleep(3)
@@ -183,7 +180,7 @@ class Object_detect():
             # 调整吸泵吸取位置，y增大,向左移动;y减小,向右移动;x增大,前方移动;x减小,向后方移动
             self.move(x, y, color)
 
-    # init mypal260
+    # init mycobot280
     def run(self):
      
         if "dev" in self.robot_wio :
@@ -248,13 +245,13 @@ class Object_detect():
         self.y2 = int(y2)
         print(self.x1, self.y1, self.x2, self.y2)
 
-    # set parameters to calculate the coords between cube and mypal260
+    # set parameters to calculate the coords between cube and mycobot280
     def set_params(self, c_x, c_y, ratio):
         self.c_x = c_x
         self.c_y = c_y
         self.ratio = 220.0/ratio
 
-    # calculate the coords between cube and mypal260
+    # calculate the coords between cube and mycobot280
     def get_position(self, x, y):
         return ((y - self.c_y)*self.ratio + self.camera_x), ((x - self.c_x)*self.ratio + self.camera_y)
 
@@ -378,7 +375,7 @@ if __name__ == "__main__":
         cap.open()
     # init a class of Object_detect
     detect = Object_detect()
-    # init mypal260
+    # init mycobot280
     detect.run()
 
     _init_ = 20  
@@ -421,7 +418,7 @@ if __name__ == "__main__":
             init_num += 1
             continue
 
-        # calculate params of the coords between cube and mypal260
+        # calculate params of the coords between cube and mycobot280
         if nparams < 10:
             if detect.get_calculate_params(frame) is None:
                 cv2.imshow("figure", frame)
@@ -438,7 +435,7 @@ if __name__ == "__main__":
                 continue
         elif nparams == 10:
             nparams += 1
-            # calculate and set params of calculating real coord between cube and mypal260
+            # calculate and set params of calculating real coord between cube and mycobot280
             detect.set_params(
                 (detect.sum_x1+detect.sum_x2)/20.0,
                 (detect.sum_y1+detect.sum_y2)/20.0,
@@ -458,7 +455,7 @@ if __name__ == "__main__":
             continue
         else:
             x, y = detect_result
-            # calculate real coord between cube and mypal260
+            # calculate real coord between cube and mycobot280
             real_x, real_y = detect.get_position(x, y)
             if num == 20:
                 

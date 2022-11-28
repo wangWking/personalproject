@@ -26,10 +26,10 @@ class Object_detect():
 
         # 移动坐标
         self.move_coords = [
-            [132.2, -136.9, 200.8, -178.24, -3.72, -107.17],  # above the red bucket
-            [238.8, -124.1, 204.3, -169.69, -5.52, -96.52], # green
-            [115.8, 177.3, 210.6, 178.06, -0.92, -6.11], # blue
-            [-6.9, 173.2, 201.5, 179.93, 0.63, 33.83], # gray
+            [132.2, -136.9, 200.8, -178.24, -3.72, -107.17],  # D Sorting area
+            [238.8, -124.1, 204.3, -169.69, -5.52, -96.52], # C Sorting area
+            [115.8, 177.3, 210.6, 178.06, -0.92, -6.11], # A Sorting area
+            [-6.9, 173.2, 201.5, 179.93, 0.63, 33.83], # B Sorting area
         ]
         
         # which robot: USB* is m5; ACM* is wio; AMA* is raspi
@@ -469,10 +469,10 @@ def run():
     child.start()
 
     res_queue = [[], [], [], []]
-    res_queue[0] = parse_folder('res/red')
-    res_queue[1] = parse_folder('res/green')
-    res_queue[2] = parse_folder('res/blue')
-    res_queue[3] = parse_folder('res/gray')
+    res_queue[0] = parse_folder('res/D')
+    res_queue[1] = parse_folder('res/C')
+    res_queue[2] = parse_folder('res/A')
+    res_queue[3] = parse_folder('res/B')
 
     sift = cv2.xfeatures2d.SIFT_create()
     # sift = cv2.SIFT_create()
