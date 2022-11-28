@@ -112,19 +112,19 @@ def cut_photo():
         
         crop = cut[y:y + h, x:x + w]
         cv2.imshow('crop', crop)
-        # 选择红桶文件夹
+        # 选择D区文件夹
         if kw == 1:
             cv2.imwrite(path + '/res/D/goal{}.jpeg'.format(str(file_len_red + 1)),crop)
             print('Saved')
-        # 选择灰桶文件夹
+        # 选择B区文件夹
         elif kw == 2:
             cv2.imwrite(path + '/res/B/goal{}.jpeg'.format(str(file_len_gray+1)),crop)
             print('Saved')
-        # 选择绿桶文件夹
+        # 选择C区文件夹
         elif kw == 3:
             cv2.imwrite(path + '/res/C/goal{}.jpeg'.format(str(file_len_green+1)),crop)
             print('Saved')
-        # 选择蓝桶文件夹
+        # 选择A区文件夹
         elif kw == 4:
             cv2.imwrite(path + '/res/A/goal{}.jpeg'.format(str(file_len_blue+1)),crop)
             print('Saved')
