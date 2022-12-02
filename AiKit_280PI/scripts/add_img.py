@@ -5,11 +5,12 @@ import os, cv2, sys
 
 def take_photo():
     # 提醒用户操作字典
-    print("*********************************************")
-    print("*  热键(请在摄像头的窗口使用)：             *")
-    print("*  z: 拍摄图片                              *")
-    print("*  q: 退出                                  *")
-    print("*********************************************")
+    print("************************************************")
+    print("*  热键(请在摄像头的窗口使用):                   *")
+    print("*  hotkey(please use it in the camera window): *")
+    print("*  z: 拍摄图片(take picture)                    *")
+    print("*  q: 退出(quit)                               *")
+    print("************************************************")
 
     # 创建/使用local_photo文件夹
     class_name = "res"
@@ -22,6 +23,8 @@ def take_photo():
 
     index = 'takephoto'
     cap = cv2.VideoCapture(0)
+    cap.set(3,640)
+    cap.set(4, 480)
 
     while True:
         # 读入每一帧
@@ -76,6 +79,7 @@ def cut_photo():
     for i, j, k in os.walk(path_blue):
         file_len_blue = len(k)
     print("请截取要识别的部分")
+    print("Please intercept the part to be identified")
     # root = tk.Tk()
     # root.withdraw()
     # temp1=filedialog.askopenfilename(parent=root)   #rgb
@@ -98,20 +102,20 @@ def cut_photo():
 
     msg = """\
     Image save location:
-        1 - Save to D folder
-        2 - Save to B folder
-        3 - Save to C folder
-        4 - Save to A folder
+        1 - Save to D folder 保存至D分拣区文件夹
+        2 - Save to B folder 保存至B分拣区文件夹
+        3 - Save to C folder 保存至C分拣区文件夹
+        4 - Save to A folder 保存至A分拣区文件夹
         """
     print(msg)
-    kw = int(input("请输入保存图片文件夹数字编号:"))
+    kw = int(input("请输入保存图片文件夹数字编号(Please enter the number of the folder to save the picture):"))
     # print(kw)
 
     # 显示ROI并保存图片
     if roi != (0, 0, 0, 0):
         
         crop = cut[y:y + h, x:x + w]
-        cv2.imshow('crop', crop)
+        # cv2.imshow('crop', crop)
         # 选择D区文件夹
         if kw == 1:
             cv2.imwrite(path + '/res/D/goal{}.jpeg'.format(str(file_len_red + 1)),crop)

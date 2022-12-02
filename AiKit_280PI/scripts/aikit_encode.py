@@ -54,11 +54,11 @@ class Detect_marker():
     def move(self, x, y):
 
         coords = [
-            [135.0, -65.5, 280.1, 178.99, 5.38, -179.9], # 初始化点
-            [132.2, -136.9, 200.8, -178.24, -3.72, -107.17],  # D分拣区
-            [238.8, -124.1, 204.3, -169.69, -5.52, -96.52], # C分拣区
-            [115.8, 177.3, 210.6, 178.06, -0.92, -6.11], # A分拣区
-            [-6.9, 173.2, 201.5, 179.93, 0.63, 33.83], # B分拣区  
+            [135.0, -65.5, 280.1, 178.99, 5.38, -179.9], # 初始化点 init point
+            [132.2, -136.9, 200.8, -178.24, -3.72, -107.17],  # D分拣区 D sorting area
+            [238.8, -124.1, 204.3, -169.69, -5.52, -96.52], # C分拣区 C sorting area
+            [115.8, 177.3, 210.6, 178.06, -0.92, -6.11], # A分拣区 A sorting area
+            [-6.9, 173.2, 201.5, 179.93, 0.63, 33.83], # B分拣区  B sorting area
         ]
 
         # send coordinates to move mycobot
@@ -136,15 +136,7 @@ class Detect_marker():
                     for i in range(rvec.shape[0]):
 			# draw the aruco on img
                         cv2.aruco.drawDetectedMarkers(img, corners)
-                        cv2.aruco.drawAxis(
-                            img,
-                            self.camera_matrix,
-                            self.dist_coeffs,
-                            rvec[i, :, :],
-                            tvec[i, :, :],
-                            0.03,
-                        )
-
+                        
                         if num < 40 :
                             sum_x += xyz[1]
                             sum_y += xyz[0]

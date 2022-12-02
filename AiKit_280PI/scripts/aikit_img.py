@@ -115,10 +115,10 @@ class Object_detect():
         # self.mc.send_coords([x, y, 150, 179.87, -3.78, -62.75], 25, 0)
         # time.sleep(3)
 
-        # self.mc.send_coords([x, y, 105, 179.87, -3.78, -62.75], 25, 0)
-        self.mc.send_coords([x, y, 103, 179.87, -3.78, -62.75], 25, 0)
+        self.mc.send_coords([x, y, 65, 179.87, -3.78, -62.75], 25, 0)
+        # self.mc.send_coords([x, y, 103, 179.87, -3.78, -62.75], 25, 0)
         
-        time.sleep(3)
+        time.sleep(4)
 
         # open pump
         if "dev" in self.robot_m5 or "dev" in self.robot_wio:

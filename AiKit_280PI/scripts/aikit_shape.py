@@ -14,7 +14,7 @@ __version__ = "1.0"
 
 class Object_detect():
 
-    def __init__(self, camera_x = 160, camera_y = 10):
+    def __init__(self, camera_x = 162, camera_y = 15):
         # inherit the parent class
         super(Object_detect, self).__init__()
         # declare mycobot280
@@ -131,8 +131,8 @@ class Object_detect():
         # self.mc.send_coords([x, y, 150, 179.87, -3.78, -62.75], 25, 0)
         # time.sleep(3)
 
-        self.mc.send_coords([x, y, 96, 179.87, -3.78, -62.75], 25, 0)
-        time.sleep(3)
+        self.mc.send_coords([x, y, 65.5, 179.87, -3.78, -62.75], 25, 0)
+        time.sleep(4)
 
         # open pump
         if "dev" in self.robot_m5 or "dev" in self.robot_wio:
@@ -332,7 +332,7 @@ class Object_detect():
                         y = int(rect[0][1])
 
                     if objCor==3:
-                        objectType = "Triangle"
+                        objectType = "Triangle(三角形)"
                         cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
                         self.color = 3
                     elif objCor==4:
@@ -342,20 +342,20 @@ class Object_detect():
                         _H = math.sqrt(math.pow((box[0][0] - box[3][0]), 2) + math.pow((box[0][1] - box[3][1]), 2))
                         aspRatio = _W/float(_H)
                         if 0.98 < aspRatio < 1.03:
-                            objectType = "Square"
+                            objectType = "Square(正方形)"
                             cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
                             self.color=1
                         else:
-                            objectType = "Rectangle"
+                            objectType = "Rectangle(长方形)"
                             cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
                             self.color=2
                     elif objCor>=5:
-                        objectType = "Circle"
+                        objectType = "Circle(圆形)"
                         self.color=0
                         cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
                     else:
                         pass
-                    print("形状为",objectType)
+                    print(objectType)
 
         if abs(x) + abs(y) > 0:
             return x, y
