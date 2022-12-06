@@ -63,7 +63,7 @@ def cut_photo():
         print("invalid file path! Please check whether the file path exists or modify it!")
 
 
-    path_red = path + '/res/D'
+    path_red = path + '/res/A'
     for i, j, k in os.walk(path_red):
         file_len_red = len(k)
 
@@ -75,7 +75,7 @@ def cut_photo():
     for i, j, k in os.walk(path_green):
         file_len_green = len(k)
 
-    path_blue = path + '/res/A'
+    path_blue = path + '/res/D'
     for i, j, k in os.walk(path_blue):
         file_len_blue = len(k)
     print("请截取要识别的部分")
