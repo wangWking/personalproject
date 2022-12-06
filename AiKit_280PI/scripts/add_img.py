@@ -102,10 +102,10 @@ def cut_photo():
 
     msg = """\
     Image save location:
-        1 - 保存至D分拣区文件夹 Save to D folder 
+        1 - 保存至A分拣区文件夹 Save to A folder 
         2 - 保存至B分拣区文件夹 Save to B folder 
         3 - 保存至C分拣区文件夹 Save to C folder 
-        4 - 保存至A分拣区文件夹 Save to A folder
+        4 - 保存至D分拣区文件夹 Save to D folder
         """
     print(msg)
     kw = int(input("请输入保存图片文件夹数字编号(Please enter the number of the folder to save the picture):"))
@@ -118,7 +118,7 @@ def cut_photo():
         # cv2.imshow('crop', crop)
         # 选择D区文件夹
         if kw == 1:
-            cv2.imwrite(path + '/res/D/goal{}.jpeg'.format(str(file_len_red + 1)),crop)
+            cv2.imwrite(path + '/res/A/goal{}.jpeg'.format(str(file_len_red + 1)),crop)
             print('Saved')
         # 选择B区文件夹
         elif kw == 2:
@@ -130,7 +130,7 @@ def cut_photo():
             print('Saved')
         # 选择A区文件夹
         elif kw == 4:
-            cv2.imwrite(path + '/res/A/goal{}.jpeg'.format(str(file_len_blue+1)),crop)
+            cv2.imwrite(path + '/res/D/goal{}.jpeg'.format(str(file_len_blue+1)),crop)
             print('Saved')
 
     # 退出

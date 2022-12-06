@@ -22,7 +22,7 @@ class Object_detect():
 
         # 移动角度
         self.move_angles = [
-            [-7.11, -6.94, -55.01, -24.16, 0, -15],  # init the point
+            [0.61, 45.87, -92.37, -41.3, 2.02, 9.58],  # init the point
             [18.8, -7.91, -54.49, -23.02, -0.79, -14.76],  # point to grab
         ]
 
@@ -170,7 +170,7 @@ class Object_detect():
         time.sleep(5)
 
         self.mc.send_angles(self.move_angles[0], 25)
-        time.sleep(3)
+        time.sleep(4.5)
 
     # decide whether grab cube 决定是否抓取立方体
     def decide_move(self, x, y, color):
@@ -194,8 +194,8 @@ class Object_detect():
             self.mc = MyCobot(self.robot_raspi, 1000000)
         if not self.raspi:
             self.pub_pump(False, self.Pin)
-        self.mc.send_angles([-7.11, -6.94, -55.01, -24.16, 0, -15], 20)
-        time.sleep(3)
+        self.mc.send_angles([0.61, 45.87, -92.37, -41.3, 2.02, 9.58], 20)
+        time.sleep(4.5)
 
     # draw aruco
     def draw_marker(self, img, x, y):
