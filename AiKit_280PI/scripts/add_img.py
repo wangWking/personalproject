@@ -102,10 +102,10 @@ def cut_photo():
 
     msg = """\
     Image save location:
-        1 - Save to D folder 保存至D分拣区文件夹
-        2 - Save to B folder 保存至B分拣区文件夹
-        3 - Save to C folder 保存至C分拣区文件夹
-        4 - Save to A folder 保存至A分拣区文件夹
+        1 - 保存至D分拣区文件夹 Save to D folder 
+        2 - 保存至B分拣区文件夹 Save to B folder 
+        3 - 保存至C分拣区文件夹 Save to C folder 
+        4 - 保存至A分拣区文件夹 Save to A folder
         """
     print(msg)
     kw = int(input("请输入保存图片文件夹数字编号(Please enter the number of the folder to save the picture):"))
