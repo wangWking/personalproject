@@ -7,8 +7,11 @@ def take_photo():
     # 提醒用户操作字典
     print("*********************************************")
     print("*  热键(请在摄像头的窗口使用)：             *")
+    print("*  Hotkey (please use it in the camera window)：             *")
     print("*  z: 拍摄图片                              *")
+    print("*  z: Take pictures                           *")
     print("*  q: 退出                                  *")
+    print("*  q: quit                                  *")
     print("*********************************************")
 
     # 创建/使用local_photo文件夹
@@ -50,8 +53,7 @@ def take_photo():
 def cut_photo():
     
     path1 = '/home/ubuntu/catkin_ws/src/mycobot_ros/mycobot_ai/ai_mypalletizer_260/'    # pi
-    path2 = r'D:/BaiduSyncdisk/PythonProject/OpenCV'         # m5
-
+    path2 = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))         # m5
     if os.path.exists(path1):
         path = path1
     elif os.path.exists(path2):
@@ -60,7 +62,7 @@ def cut_photo():
         print("invalid file path! Please check whether the file path exists or modify it!")
 
 
-    path_red = path + '/res/D'
+    path_red = path + '/res/A'
     for i, j, k in os.walk(path_red):
         file_len_red = len(k)
 
@@ -72,7 +74,7 @@ def cut_photo():
     for i, j, k in os.walk(path_green):
         file_len_green = len(k)
 
-    path_blue = path + '/res/A'
+    path_blue = path + '/res/D'
     for i, j, k in os.walk(path_blue):
         file_len_blue = len(k)
     print("请截取要识别的部分")
@@ -98,23 +100,23 @@ def cut_photo():
 
     msg = """\
     Image save location:
-        1 - Save to D folder
-        2 - Save to B folder
-        3 - Save to C folder
-        4 - Save to A folder
+        1 - 保存至A分拣区文件夹 Save to A folder 
+        2 - 保存至B分拣区文件夹 Save to B folder 
+        3 - 保存至C分拣区文件夹 Save to C folder 
+        4 - 保存至D分拣区文件夹 Save to D folder
         """
     print(msg)
-    kw = int(input("请输入保存图片文件夹数字编号:"))
+    kw = int(input("请输入保存图片文件夹数字编号（Please enter the number of the folder to save the picture）:"))
     # print(kw)
 
     # 显示ROI并保存图片
     if roi != (0, 0, 0, 0):
         
         crop = cut[y:y + h, x:x + w]
-        cv2.imshow('crop', crop)
+        # cv2.imshow('crop', crop)
         # 选择D区文件夹
         if kw == 1:
-            cv2.imwrite(path + '/res/D/goal{}.jpeg'.format(str(file_len_red + 1)),crop)
+            cv2.imwrite(path + '/res/A/goal{}.jpeg'.format(str(file_len_red + 1)),crop)
             print('Saved')
         # 选择B区文件夹
         elif kw == 2:
@@ -126,7 +128,7 @@ def cut_photo():
             print('Saved')
         # 选择A区文件夹
         elif kw == 4:
-            cv2.imwrite(path + '/res/A/goal{}.jpeg'.format(str(file_len_blue+1)),crop)
+            cv2.imwrite(path + '/res/D/goal{}.jpeg'.format(str(file_len_blue+1)),crop)
             print('Saved')
 
     # 退出

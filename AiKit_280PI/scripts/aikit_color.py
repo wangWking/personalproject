@@ -14,7 +14,7 @@ __version__ = "1.0"
 
 class Object_detect():
 
-    def __init__(self, camera_x = 155, camera_y = 10):
+    def __init__(self, camera_x = 155, camera_y = 15):
         # inherit the parent class
         super(Object_detect, self).__init__()
         # declare mycobot280
@@ -46,8 +46,8 @@ class Object_detect():
             # self.Pin = [20, 21]
             self.Pin = [2, 5]
 
-            for i in self.move_coords:
-                i[2] -= 20
+            # for i in self.move_coords:
+            #     i[2] -= 20
         elif "dev" in self.robot_raspi or "dev" in self.robot_jes:
             import RPi.GPIO as GPIO
             GPIO.setwarnings(False)
@@ -69,8 +69,8 @@ class Object_detect():
         self.cache_x = self.cache_y = 0
         # set color HSV
         self.HSV = {
-            # "yellow": [np.array([11, 85, 70]), np.array([59, 255, 245])],
-            "yellow": [np.array([22, 93, 0]), np.array([45, 255, 245])],
+            "yellow": [np.array([11, 85, 70]), np.array([59, 255, 245])],
+            #"yellow": [np.array([22, 93, 0]), np.array([45, 255, 245])],
             "red": [np.array([0, 43, 46]), np.array([8, 255, 255])],
             "green": [np.array([35, 43, 35]), np.array([90, 255, 255])],
             "blue": [np.array([100, 43, 46]), np.array([124, 255, 255])],
@@ -100,23 +100,23 @@ class Object_detect():
     # pump_control pi
     def gpio_status(self, flag):
         if flag:
-            # self.GPIO.output(20, 0)
+            self.GPIO.output(20, 0)
             self.GPIO.output(21, 0)
         else:
-            # self.GPIO.output(20, 1)
+            self.GPIO.output(20, 1)
             self.GPIO.output(21, 1)
     
     # 开启吸泵 m5
     def pump_on(self):
         # 让2号位工作
-        # self.mc.set_basic_output(2, 0)
+        self.mc.set_basic_output(2, 0)
         # 让5号位工作
         self.mc.set_basic_output(5, 0)
 
     # 停止吸泵 m5
     def pump_off(self):
         # 让2号位停止工作
-        # self.mc.set_basic_output(2, 1)
+        self.mc.set_basic_output(2, 1)
         # 让5号位停止工作
         self.mc.set_basic_output(5, 1)
 
@@ -128,7 +128,7 @@ class Object_detect():
         time.sleep(3)
 
         # send coordinates to move mycobot
-        self.mc.send_coords([x, y,  190.6, 179.87, -3.78, -62.75], 25, 1) # usb :rx,ry,rz -173.3, -5.48, -57.9
+        self.mc.send_coords([x, y,  170.6, 179.87, -3.78, -62.75], 25, 1) # usb :rx,ry,rz -173.3, -5.48, -57.9
         time.sleep(3)
         
         # self.mc.send_coords([x, y, 150, 179.87, -3.78, -62.75], 25, 0)
@@ -154,7 +154,7 @@ class Object_detect():
         
         # print(tmp)
         self.mc.send_angles([tmp[0], -0.71, -54.49, -23.02, -0.79, tmp[5]],25) # [18.8, -7.91, -54.49, -23.02, -0.79, -14.76]
-        time.sleep(2.5)
+        time.sleep(3)
 
         self.mc.send_coords(self.move_coords[color], 25, 1)
         # self.pub_marker(self.move_coords[color][0]/1000.0, self.move_coords[color]
@@ -174,7 +174,7 @@ class Object_detect():
 
     # decide whether grab cube 决定是否抓取立方体
     def decide_move(self, x, y, color):
-        print('decide-->',x, y, self.cache_x, self.cache_y)
+        print(x, y, self.cache_x, self.cache_y)
         # detect the cube status move or run 检测立方体状态移动或运行
         if (abs(x - self.cache_x) + abs(y - self.cache_y)) / 2 > 5:  # mm
             self.cache_x, self.cache_y = x, y
@@ -195,7 +195,7 @@ class Object_detect():
         if not self.raspi:
             self.pub_pump(False, self.Pin)
         self.mc.send_angles([0.61, 45.87, -92.37, -41.3, 2.02, 9.58], 20)
-        time.sleep(4.5)
+        time.sleep(2.5)
 
     # draw aruco
     def draw_marker(self, img, x, y):

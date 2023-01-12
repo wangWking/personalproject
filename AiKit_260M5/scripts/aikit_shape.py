@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import time
 import os,sys
+import serial
+import serial.tools.list_ports
 import math
 from pymycobot.mypalletizer import MyPalletizer
 
@@ -13,9 +15,15 @@ __version__ = "1.0"
 
 class Object_detect():
 
-    def __init__(self, camera_x = 160, camera_y = 10):
+    def __init__(self, camera_x = 165, camera_y = 10):
         # inherit the parent class
         super(Object_detect, self).__init__()
+        
+        # get real serial
+        self.plist = [
+            str(x).split(" - ")[0].strip() for x in serial.tools.list_ports.comports()
+        ]
+        
         # declare mypal260
         self.mc = None
 
@@ -39,15 +47,6 @@ class Object_detect():
         self.x1 = self.x2 = self.y1 = self.y2 = 0
         # set cache of real coord
         self.cache_x = self.cache_y = 0
-        # set color HSV
-        self.HSV = {
-            # "yellow": [np.array([11, 85, 70]), np.array([59, 255, 245])],
-            "yellow": [np.array([22, 93, 0]), np.array([45, 255, 245])],
-            "red": [np.array([0, 43, 46]), np.array([8, 255, 255])],
-            "green": [np.array([35, 43, 35]), np.array([90, 255, 255])],
-            "blue": [np.array([100, 43, 46]), np.array([124, 255, 255])],
-            "cyan": [np.array([78, 43, 46]), np.array([99, 255, 255])],
-        }
 
         # use to calculate coord between cube and mypal260
         self.sum_x1 = self.sum_x2 = self.sum_y2 = self.sum_y1 = 0
@@ -68,14 +67,14 @@ class Object_detect():
     # 开启吸泵 m5
     def pump_on(self):
         # 让2号位工作
-        # self.mc.set_basic_output(2, 0)
+        self.mc.set_basic_output(2, 0)
         # 让5号位工作
         self.mc.set_basic_output(5, 0)
 
     # 停止吸泵 m5
     def pump_off(self):
         # 让2号位停止工作
-        # self.mc.set_basic_output(2, 1)
+        self.mc.set_basic_output(2, 1)
         # 让5号位停止工作
         self.mc.set_basic_output(5, 1)
 
@@ -87,9 +86,9 @@ class Object_detect():
         time.sleep(3)
 
         # send coordinates to move mypal260
-        self.mc.send_coords([x, y, 160, 0], 20, 0)
+        self.mc.send_coords([x, y, 100, 0], 20, 0)
         time.sleep(1.5)
-        self.mc.send_coords([x, y, 110, 0], 20, 0)
+        self.mc.send_coords([x, y, 66, 0], 20, 0)
         time.sleep(1.5)
 
         # open pump
@@ -132,7 +131,7 @@ class Object_detect():
     # init mypal260
     def run(self):
      
-        self.mc = MyPalletizer("COM9", 115200)
+        self.mc = MyPalletizer(self.plist[0], 115200)
         self.mc.send_angles([-29.0, 5.88, -4.92, -76.28], 20)
         time.sleep(3)
 
@@ -211,7 +210,7 @@ class Object_detect():
         if self.x1 != self.x2:
             # the cutting ratio here is adjusted according to the actual situation
             frame = frame[int(self.y2*0.78):int(self.y1*1.1),
-                          int(self.x1*0.88):int(self.x2*1.06)]
+                          int(self.x1*0.86):int(self.x2*1.08)]
         return frame
     
     # 检测物体的形状
@@ -270,7 +269,7 @@ class Object_detect():
                         y = int(rect[0][1])
 
                     if objCor==3:
-                        objectType = "Triangle"
+                        objectType = ["Triangle","三角形"]
                         self.color = 3
                         cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
                         
@@ -281,20 +280,20 @@ class Object_detect():
                         _H = math.sqrt(math.pow((box[0][0] - box[3][0]), 2) + math.pow((box[0][1] - box[3][1]), 2))
                         aspRatio = _W/float(_H)
                         if 0.98 < aspRatio < 1.03:
-                            objectType = "Square"
+                            objectType = ["Square","正方形"]
                             cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
                             self.color=1
                         else:
-                            objectType = "Rectangle"
+                            objectType = ["Rectangle","长方形"]
                             cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
                             self.color=2
                     elif objCor>=5:
-                        objectType = "Circle"
+                        objectType = ["Circle", "圆形"]
                         self.color=0
                         cv2.drawContours(img, [cnt], 0, (0, 0, 255), 3)
                     else:
                         pass
-                    print("形状为",objectType)
+                    print(f"shape is {objectType[0]}(形状为{objectType[1]})")
 
         if abs(x) + abs(y) > 0:
             return x, y

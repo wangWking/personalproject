@@ -44,8 +44,8 @@ class Object_detect():
             # self.Pin = [20, 21]
             self.Pin = [2, 5]
 
-            for i in self.move_coords:
-                i[2] -= 20
+            # for i in self.move_coords:
+            #     i[2] -= 20
         elif "dev" in self.robot_raspi or "dev" in self.robot_jes:
             import RPi.GPIO as GPIO
             GPIO.setwarnings(False)
@@ -82,23 +82,23 @@ class Object_detect():
     # pump_control pi
     def gpio_status(self, flag):
         if flag:
-            # self.GPIO.output(20, 0)
+            self.GPIO.output(20, 0)
             self.GPIO.output(21, 0)
         else:
-            # self.GPIO.output(20, 1)
+            self.GPIO.output(20, 1)
             self.GPIO.output(21, 1)
 
     # 开启吸泵 m5
     def pump_on(self):
         # 让2号位工作
-        # self.mc.set_basic_output(2, 0)
+        self.mc.set_basic_output(2, 0)
         # 让5号位工作
         self.mc.set_basic_output(5, 0)
 
     # 停止吸泵 m5
     def pump_off(self):
         # 让2号位停止工作
-        # self.mc.set_basic_output(2, 1)
+        self.mc.set_basic_output(2, 1)
         # 让5号位停止工作
         self.mc.set_basic_output(5, 1)
 
@@ -109,7 +109,7 @@ class Object_detect():
         time.sleep(3)
 
         # send coordinates to move mycobot
-        self.mc.send_coords([x, y,  190.6, 179.87, -3.78, -62.75], 25, 1) # usb :rx,ry,rz -173.3, -5.48, -57.9
+        self.mc.send_coords([x, y,  170.6, 179.87, -3.78, -62.75], 25, 1) # usb :rx,ry,rz -173.3, -5.48, -57.9
         time.sleep(3)
         
         # self.mc.send_coords([x, y, 150, 179.87, -3.78, -62.75], 25, 0)
@@ -137,7 +137,7 @@ class Object_detect():
 
          # print(tmp)
         self.mc.send_angles([tmp[0], -0.71, -54.49, -23.02, -0.79, tmp[5]],25) # [18.8, -7.91, -54.49, -23.02, -0.79, -14.76]
-        time.sleep(2.5)
+        time.sleep(3)
 
 
 
@@ -180,7 +180,7 @@ class Object_detect():
         if not self.raspi:
             self.pub_pump(False, self.Pin)
         self.mc.send_angles([0.61, 45.87, -92.37, -41.3, 2.02, 9.58], 20)
-        time.sleep(4.5)
+        time.sleep(2.5)
 
 
     # draw aruco
@@ -366,13 +366,14 @@ class Object_detect():
 # The path to save the image folder
 def parse_folder(folder):
     restore = []
-    path1 = '/home/er/AiKit_280PI/' + folder
+    path = ''
+    path1 = '/home/er/aikit_V2/AiKit_280PI/' + folder
     path2 = r'D:/BaiduSyncdisk/PythonProject/OpenCV/' + folder
 
-    # if os.path.exists(path1):
-    #     path = path1
-    # elif os.path.exists(path2):
-    path = path1
+    if os.path.exists(path1):
+        path = path1
+    elif os.path.exists(path2):
+        path = path2
 
     for i, j, k in os.walk(path):
         for l in k:
@@ -415,10 +416,10 @@ def process_transform_frame(frame, x1, y1, x2, y2):
                         fx=fx,
                         fy=fy,
                         interpolation=cv2.INTER_CUBIC)
-    # if x1 != x2:
-    #     # the cutting ratio here is adjusted according to the actual situation
-    #    frame = frame[int(y2 * 0.2):int(y1 * 1.15),
-    #                    int(x1 * 0.7):int(x2 * 1.15)]
+    if x1 != x2:
+        # the cutting ratio here is adjusted according to the actual situation
+       frame = frame[int(y2 * 0.7):int(y1 * 1.15),
+                       int(x1 * 0.7):int(x2 * 1.15)]
     return frame
 
 def process_display_frame(connection):
